@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -95,7 +96,12 @@ public class CoinyLoginActivity extends Activity {
                     os.close();
 
                     StringBuilder sb = new StringBuilder();
-                    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    BufferedReader rd;
+                    try {
+                        rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    } catch (FileNotFoundException e) {
+                        rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                    }
                     String line;
                     while ((line = rd.readLine()) != null) {
                         sb.append(line);
@@ -106,8 +112,9 @@ public class CoinyLoginActivity extends Activity {
                     if (response.getString("status").equals("Ok")) {
                         SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).edit();
                         editor.putString(Constants.ACCESS_TOKEN, response.getString("data")).apply();
+                        Coiny.coinyLoginViewResponseListener.coinyDidLoggedIn();
                     } else {
-
+                        Coiny.coinyLoginViewResponseListener.coinyLoginDidFail(response.getString("message"));
                     }
 
                     conn.disconnect();

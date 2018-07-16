@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 
 public class Coiny {
 
+    public static Coiny.CoinyLoginViewResponseListener coinyLoginViewResponseListener;
+
     public static void initialize(Context context, String appId, String appSecret, boolean isDevelopment) {
         SharedPreferences.Editor editor = context.getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).edit();
         editor.putString(Constants.APP_ID, appId);
@@ -25,5 +27,14 @@ public class Coiny {
 
     public static void logout() {
 
+    }
+
+    public static void setCoinyLoginViewResponseListener(Coiny.CoinyLoginViewResponseListener coinyLoginViewResponseListener) {
+        Coiny.coinyLoginViewResponseListener = coinyLoginViewResponseListener;
+    }
+
+    public interface CoinyLoginViewResponseListener {
+        void coinyDidLoggedIn();
+        void coinyLoginDidFail(String error);
     }
 }
