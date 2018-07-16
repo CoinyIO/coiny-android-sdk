@@ -3,14 +3,21 @@ package io.coiny.android.sdk;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class CoinyLoginActivity extends Activity {
 
@@ -20,7 +27,6 @@ public class CoinyLoginActivity extends Activity {
     private String appSecret;
     private String authToken;
 
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +37,11 @@ public class CoinyLoginActivity extends Activity {
         appId = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).getString(Constants.APP_ID, null);
         appSecret = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).getString(Constants.APP_SECRET, null);
 
+        setupWebView();
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private void setupWebView () {
         String uri = Uri.parse(getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).getString(Constants.URL, null)
                 + "oauth2/" + appId + "/login")
                 .buildUpon()
@@ -39,27 +50,74 @@ public class CoinyLoginActivity extends Activity {
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
-            @Nullable
             @Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                String newAuthToken = request.getUrl().getQueryParameters("auth_token").get(0);
 
-                String auth_token = request.getUrl().getQueryParameter("auth_token");
-
-                if (auth_token != null) {
-                    authToken = auth_token;
+                if (newAuthToken != null) {
+                    authToken = newAuthToken;
                     Log.i("Info", "Logged In");
                     getToken();
                 }
-                return super.shouldInterceptRequest(view, request);
+
+                return super.shouldOverrideUrlLoading(view, request);
             }
         });
 
         webView.loadUrl(uri);
     }
 
-    private void getToken() {
-        String url = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).getString(Constants.URL, null)
-                + "applications/" + appId + "/token";
+    public void getToken() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String urlString = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).getString(Constants.URL, null)
+                            + "applications/" + appId + "/token";
+                    URL url = new URL(urlString);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+                    conn.setRequestProperty("Accept","application/json");
+                    conn.setDoOutput(true);
+                    conn.setDoInput(true);
+
+                    JSONObject jsonParam = new JSONObject();
+                    jsonParam.put("authCode", authToken);
+                    jsonParam.put("applicationId", appId);
+                    jsonParam.put("applicationSecret", appSecret);
+
+                    Log.i("JSON", jsonParam.toString());
+                    DataOutputStream os = new DataOutputStream(conn.getOutputStream());
+                    os.writeBytes(jsonParam.toString());
+
+                    os.flush();
+                    os.close();
+
+                    StringBuilder sb = new StringBuilder();
+                    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    String line;
+                    while ((line = rd.readLine()) != null) {
+                        sb.append(line);
+                    }
+
+                    JSONObject response = new JSONObject(sb.toString());
+
+                    if (response.getString("status").equals("Ok")) {
+                        SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).edit();
+                        editor.putString(Constants.ACCESS_TOKEN, response.getString("data")).apply();
+                    } else {
+
+                    }
+
+                    conn.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
     }
 
 }
