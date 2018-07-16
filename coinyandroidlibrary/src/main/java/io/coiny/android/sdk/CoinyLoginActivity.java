@@ -7,10 +7,12 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
+import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -23,6 +25,7 @@ import java.net.URL;
 public class CoinyLoginActivity extends Activity {
 
     WebView webView;
+    ProgressBar progressBar;
 
     private String appId;
     private String appSecret;
@@ -34,6 +37,9 @@ public class CoinyLoginActivity extends Activity {
         setContentView(R.layout.activity_login);
 
         webView = findViewById(R.id.web_view);
+        progressBar = findViewById(R.id.progress_bar);
+        webView.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
 
         appId = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).getString(Constants.APP_ID, null);
         appSecret = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).getString(Constants.APP_SECRET, null);
@@ -57,7 +63,6 @@ public class CoinyLoginActivity extends Activity {
 
                 if (newAuthToken != null) {
                     authToken = newAuthToken;
-                    Log.i("Info", "Logged In");
                     getToken();
                 }
 
@@ -69,6 +74,8 @@ public class CoinyLoginActivity extends Activity {
     }
 
     public void getToken() {
+        progressBar.setVisibility(View.VISIBLE);
+        webView.setVisibility(View.GONE);
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -88,7 +95,6 @@ public class CoinyLoginActivity extends Activity {
                     jsonParam.put("applicationId", appId);
                     jsonParam.put("applicationSecret", appSecret);
 
-                    Log.i("JSON", jsonParam.toString());
                     DataOutputStream os = new DataOutputStream(conn.getOutputStream());
                     os.writeBytes(jsonParam.toString());
 
@@ -112,8 +118,10 @@ public class CoinyLoginActivity extends Activity {
                     if (response.getString("status").equals("Ok")) {
                         SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).edit();
                         editor.putString(Constants.ACCESS_TOKEN, response.getString("data")).apply();
+                        finish();
                         Coiny.coinyLoginViewResponseListener.coinyDidLoggedIn();
                     } else {
+                        finish();
                         Coiny.coinyLoginViewResponseListener.coinyLoginDidFail(response.getString("message"));
                     }
 

@@ -2,6 +2,7 @@ package io.coiny.android.example;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -33,11 +34,11 @@ public class MainActivity extends AppCompatActivity implements Coiny.CoinyLoginV
 
     @Override
     public void coinyDidLoggedIn() {
-        Toast.makeText(this, "Login Success", Toast.LENGTH_LONG).show();
+        Log.i("CoinyLogin", "Successful");
     }
 
     @Override
     public void coinyLoginDidFail(String error) {
-        Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+        Log.i("CoinyLogin", error);
     }
 }
