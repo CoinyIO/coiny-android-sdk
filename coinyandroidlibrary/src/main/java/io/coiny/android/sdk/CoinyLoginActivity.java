@@ -115,6 +115,7 @@ public class CoinyLoginActivity extends Activity {
 
                     JSONObject response = new JSONObject(sb.toString());
 
+                    conn.disconnect();
                     if (response.getString("status").equals("Ok")) {
                         SharedPreferences.Editor editor = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).edit();
                         editor.putString(Constants.ACCESS_TOKEN, response.getString("data")).apply();
@@ -125,7 +126,7 @@ public class CoinyLoginActivity extends Activity {
                         Coiny.coinyLoginViewResponseListener.coinyLoginDidFail(response.getString("message"));
                     }
 
-                    conn.disconnect();
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
