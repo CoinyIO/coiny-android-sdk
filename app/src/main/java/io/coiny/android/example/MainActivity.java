@@ -42,12 +42,12 @@ public class MainActivity extends AppCompatActivity implements Coiny.CoinyLoginV
                         null, "GET", new CoinyApiRequest.CoinyResponseListener() {
                     @Override
                     public void coinyRequestSuccess(JSONObject response) {
-                        int i = 0;
+                        Log.i("CoinyWallets", response.toString());
                     }
 
                     @Override
                     public void coinyRequestFail(JSONObject error) {
-                        int i = 0;
+                        Log.i("CoinyWallets", error.toString());
                     }
                 });
             }
