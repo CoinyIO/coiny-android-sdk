@@ -4,11 +4,20 @@ CoinySDK allows you to buy and sell cryptocurrencies inside your Android applica
 
 # Installation
 
-// TODO
+To install the SDK:
 
-To install the SDK open your gradle file and type:
+Add it in your root build.gradle at the end of repositories:
 
-compile '???'
+    allprojects {
+        repositories {
+            ...
+            maven { url 'https://jitpack.io' }
+        }
+    }
+
+Add the dependency:
+
+`implementation 'com.github.CoinyIO:coiny-android-sdk:0.0.1'`
 
 For login flow to work, CoinyLoginActivity needs to be added to AndroidManifest.xml:
 
