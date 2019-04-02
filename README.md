@@ -17,7 +17,7 @@ Add it in your root build.gradle at the end of repositories:
 
 Add the dependency:
 
-`implementation 'com.github.CoinyIO:coiny-android-sdk:0.0.1'`
+`implementation 'com.github.CoinyIO:coiny-android-sdk:0.0.2'`
 
 For login flow to work, CoinyLoginActivity needs to be added to AndroidManifest.xml:
 
@@ -37,11 +37,11 @@ First of all you need to retrieve API Key and API Secret from Coiny. To add API 
 
 1. Open your Application Class and add the following
 
-`Coiny.initialize(this, "your-app-id", "your-app-secret", true);`
+`Coiny.initialize(this, "your-app-id", true);`
 
 If you want to test it on the sandbox environment:
 
-`Coiny.initialize(this, "your-app-id", "your-app-secret", false);`
+`Coiny.initialize(this, "your-app-id", false);`
 
 2. To authorize a user for your application: 
 
@@ -55,11 +55,10 @@ Also, you need to set listener like this:
 
 `Coiny.setCoinyLoginViewResponseListener(this);`
 
-There are 2 override methods that notifies you if the user is authenticated.
+There is a override method that notifies you if the user is authenticated.
 
-	public protocol CoinyLoginViewDelegate : AnyObject {
-		func coinyDidLoggedIn() -> Void
-		func coinyLoginDidFail(error : Error?) -> Void
+	public interface CoinyLoginViewResponseListener {
+		void coinyLoginDidGetToken(String authToken);
 	}
 
 # Making API Calls
