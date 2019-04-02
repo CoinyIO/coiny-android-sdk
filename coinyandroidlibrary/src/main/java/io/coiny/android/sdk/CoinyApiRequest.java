@@ -26,7 +26,7 @@ public class CoinyApiRequest {
                     conn.setRequestMethod(httpMethod);
                     conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
                     conn.setRequestProperty("Accept","application/json");
-                    String token = context.getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).getString(Constants.ACCESS_TOKEN, null);
+                    String token = context.getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE).getString(Constants.OAUTH_TOKEN, null);
                     if (token != null) {
                         conn.setRequestProperty("Authorization", "Bearer "+token);
                     }

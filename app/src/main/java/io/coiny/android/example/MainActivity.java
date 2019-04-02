@@ -24,8 +24,7 @@ public class MainActivity extends AppCompatActivity implements Coiny.CoinyLoginV
         loginWithCoinyButton = findViewById(R.id.login_button);
         walletsButton = findViewById(R.id.wallets_button);
 
-        Coiny.initialize(this, "08d5e7f5-4b49-4bb4-be00-7d3a60b52ce1",
-                "DeZ79FN+4/6HWI7Xl4eE14/e3vxkJ4jQ6CmsZu3GxYk=", true);
+        Coiny.initialize(this, "APP_ID", true);
         Coiny.setCoinyLoginViewResponseListener(this);
 
         loginWithCoinyButton.setOnClickListener(new View.OnClickListener() {
@@ -62,5 +61,10 @@ public class MainActivity extends AppCompatActivity implements Coiny.CoinyLoginV
     @Override
     public void coinyLoginDidFail(String error) {
         Log.i("CoinyLogin", error);
+    }
+
+    @Override
+    public void coinyLoginDidGetToken(String authToken) {
+        Log.i("CoinyLogin", authToken);
     }
 }
