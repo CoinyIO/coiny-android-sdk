@@ -17,7 +17,7 @@ Add it in your root build.gradle at the end of repositories:
 
 Add the dependency:
 
-`implementation 'com.github.CoinyIO:coiny-android-sdk:0.0.2'`
+`implementation 'com.github.CoinyIO:coiny-android-sdk:0.0.3'`
 
 For login flow to work, CoinyLoginActivity needs to be added to AndroidManifest.xml:
 
