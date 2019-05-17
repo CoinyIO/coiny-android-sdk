@@ -68,19 +68,6 @@ public class CoinyLoginActivity extends Activity {
 
                 return super.shouldOverrideUrlLoading(view, url);
             }
-
-            @RequiresApi(Build.VERSION_CODES.N)
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                String newAuthToken = request.getUrl().getQueryParameters("auth_token").get(0);
-
-                if (newAuthToken != null) {
-                    finish();
-                    Coiny.coinyLoginViewResponseListener.coinyLoginDidGetToken(newAuthToken);
-                }
-
-                return super.shouldOverrideUrlLoading(view, request);
-            }
         });
 
         webView.loadUrl(uri);
