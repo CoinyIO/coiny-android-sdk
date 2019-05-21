@@ -14,6 +14,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import java.util.List;
+
 public class CoinyLoginActivity extends Activity {
 
     WebView webView;
@@ -59,7 +61,11 @@ public class CoinyLoginActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 Uri uri = Uri.parse( url );
-                String newAuthToken = uri.getQueryParameters("auth_token").get(0);
+                List<String> parameters = uri.getQueryParameters("auth_token");
+                String newAuthToken = null;
+                if (parameters != null && parameters.size()>0) {
+                    newAuthToken = parameters.get(0);
+                }
 
                 if (newAuthToken != null) {
                     finish();
